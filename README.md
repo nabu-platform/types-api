@@ -12,7 +12,7 @@ The API is based on three concepts:
 	- **Last Name**: string
 	- **First Name**: string
 	- **Age**: integer
-- Elements: types describe what data looks like but there are a number of properties related to actual instances that can differ. For example let’s take the complex type Person from the above example, suppose we have a Company type:
+- **Elements**: types describe what data looks like but there are a number of properties related to actual instances that can differ. For example let’s take the complex type Person from the above example, suppose we have a Company type:
 	- **Name**: string
 	- **Address**: string
 	- **CEO**: Person
@@ -33,7 +33,7 @@ Note that concepts like choice, extension and (to some degree) restriction are s
 
 The problem is that java already has a lot of utilities but there is no overarching vision to unify these tools to allow them to work in different contexts.
 For example there is XPath but it was designed to work on XML. Yes in Jaxen you can implement the (rather complex) Navigator interface to query other backends but it is not part of a larger whole, it works only for jaxen. 
-Additionally xpath was designed for XML so uses constructs that may not be reflected everywhere and may be limited by constraints inherent to XML (e.g. the "|" operator breaks static type checks).
+Additionally xpath was designed for XML so uses constructs that may not be reflected everywhere and may be limited by constraints inherent to XML or XPath (e.g. the "|" operator breaks static type checks).
 
 JAXB is awesome for binding XML to beans but suppose you are working in an environment where beans take a backseat to other data representations? 
 I have worked a lot with Webmethods where a custom data format is used, JAXB is useless in that context.
@@ -95,7 +95,7 @@ Now for the important question: which tools exist based on these API’s?
 
 The evaluator is comparable to an xpath engine. In fact because we have an XML implementation I can (and have) pit it against the xpath engine as a comparison. A short overview of the advantages of the evaluator over xpath:
 - Can be run on all complex content (xml, java objects, IData instances,…)
-- Type checking: if you give the engine a complex type it can statically validate the rule which means you will have fewer runtime exceptions
+- Type checking: if you give the engine a complex type it can *statically validate* the rule which means you will have fewer runtime exceptions
 - Return types: in xpath the developer has to tell the engine what resultset it should return (a string, a nodeset,…). The evaluator will return a deterministic result based on the query.
 - Tight integration with java: you can call static methods easily in a query.
 - It’s a general evaluator so you can also ask it how much "1+1" is.
@@ -208,8 +208,8 @@ public static interface Message {
 public static interface MyMessageProvider {
 	public List<Message> getMessages();
 }
-
 ```
+
 As the rule is correct, the evaluator will simply return an empty list of validation messages indicating that everything is ok:
 
 ```
@@ -221,7 +221,8 @@ However suppose we type this:
 ```java
 public static void main(String...args) throws ParseException {
 	Operation operation = PathAnalyzer.analyze(
-		QueryParser.getInstance().parse("messages[logLevel < 2]/message")); System.out.println(operation.validate(new BeanType(MyMessageProvider.class)));
+		QueryParser.getInstance().parse("messages[logLevel < 2]/message")); 
+	System.out.println(operation.validate(new BeanType(MyMessageProvider.class)));
 }
 ```
 
@@ -274,20 +275,21 @@ This will also print out a validation error:
 ## Data Binding
 
 A data structure is only as useful as the data you can put in it. To that end there are parsers and formatters for the types API. Currently two types are supported:
-- XML: there is transparent support for large XML documents meaning that if you bind an XML to say a structure and tomorrow it turns out that the XML documents can actually be quite large, all you need to do is change a configuration setting.
-- Flat: it also supports large flat files using the same method as the XML binding. Fixed length & delimiter based parsing are both supported.
+- **XML**: there is transparent support for large XML documents meaning that if you bind an XML to say a structure and tomorrow it turns out that the XML documents can actually be quite large, all you need to do is change a configuration setting.
+- **Flat**: it also supports large flat files using the same method as the XML binding. Fixed length & delimiter based parsing are both supported.
 
 ## Conversions
 
 There is an extensible conversion system working in the background which tries to strike a balance between the simplicity of dynamic types with the assurances of static types. You could turn it off altogether or extend it with custom conversion logic, check the convert-api package.
+
 Because of the extra typing information we also allow more complex conversions using this API. 
 Where the converter-api package can not convert a string to date due to lack of information, this API actually allows it because the SimpleType date should contain all the information necessary to perform conversions.
 
 ## Definition Binding
 
 At some point you need to store your definitions and optionally send them to other parties. There are currently two definition bindings:
-- XML: a custom xml format that allows you to store your complex type in a human-readable fashion
-- XML Schema: a standards based format to store your complex type in a way that other systems can read it
+- **XML**: a custom xml format that allows you to store your complex type in a human-readable fashion
+- **XML Schema**: a standards based format to store your complex type in a way that other systems can read it
 
 This means you can take your java class and dump it to an XML schema if you want:
 
