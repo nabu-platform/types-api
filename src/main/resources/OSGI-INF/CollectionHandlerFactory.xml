@@ -1,0 +1,12 @@
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="be.nabu.libs.types.CollectionHandlerFactory">
+	
+	<implementation class="be.nabu.libs.types.CollectionHandlerFactory" />
+	
+ 	<reference name="CollectionHandlerFactory"
+		interface="be.nabu.libs.types.api.CollectionHandler"
+		bind="setHandler"
+		unbind="unsetHandler"
+		cardinality="0..1"
+		policy="static"/>
+		
+</scr:component>
