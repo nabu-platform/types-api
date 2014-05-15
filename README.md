@@ -16,8 +16,7 @@ The API is based on three concepts:
 	- **Name**: string
 	- **Address**: string
 	- **CEO**: Person
-	- **Employees**: Person
-In this case the CEO is one person and he must, there can however be zero or more employees: it could be a one man show (the CEO only) or it could be a multinational with thousands of employees. So at the very least we need a way to describe multiplicity. These circumstantial properties however do not change the type of Person, they are related to the context it is used in. To allow for such contextual representations, the types are wrapped in an element.
+	- **Employees**: Person. In this case the CEO is one person and he must exist, there can however be zero or more employees: it could be a one man show (the CEO only) or it could be a multinational with thousands of employees. So at the very least we need a way to describe multiplicity. These circumstantial properties however do not change the type of Person, they are related to the context it is used in. To allow for such contextual representations, the types are wrapped in an element.
 - **ComplexContent**: at runtime the simple types are of course simply instances of whatever class represents them, however complex types are exposed as ComplexContent implementations.
 
 These concepts are of course nothing new, they correlate strongly with existing interpretations:
