@@ -9,14 +9,14 @@ The API is based on three concepts:
 
 - **Simple Types**: a simple type has a singular base data representation, for instance a string, an integer, a date,…
 - **Complex Types**: combines zero or more simple types and other complex types into a group, for example a complex type Person could consist of multiple simple types:
--- **Last Name**: string
--- **First Name**: string
--- **Age**: integer
+	- **Last Name**: string
+	- **First Name**: string
+	- **Age**: integer
 - Elements: types describe what data looks like but there are a number of properties related to actual instances that can differ. For example let’s take the complex type Person from the above example, suppose we have a Company type:
--- **Name**: string
--- **Address**: string
--- **CEO**: Person
--- **Employees**: Person
+	- **Name**: string
+	- **Address**: string
+	- **CEO**: Person
+	- **Employees**: Person
 In this case the CEO is one person and he must, there can however be zero or more employees: it could be a one man show (the CEO only) or it could be a multinational with thousands of employees. So at the very least we need a way to describe multiplicity. These circumstantial properties however do not change the type of Person, they are related to the context it is used in. To allow for such contextual representations, the types are wrapped in an element.
 - **ComplexContent**: at runtime the simple types are of course simply instances of whatever class represents them, however complex types are exposed as ComplexContent implementations.
 
