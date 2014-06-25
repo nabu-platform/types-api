@@ -20,6 +20,9 @@ public class DefinedTypeResolverFactory {
 	
 	public DefinedTypeResolver getResolver() {
 		if (resolvers.isEmpty()) {
+			// it will first try to resolve it as a simple type
+			// this will take care of e.g. boolean, string,...
+			resolvers.add(new DefinedSimpleTypeResolver(SimpleTypeWrapperFactory.getInstance().getWrapper()));
 			ServiceLoader<DefinedTypeResolver> serviceLoader = ServiceLoader.load(DefinedTypeResolver.class);
 			for (DefinedTypeResolver resolver : serviceLoader)
 				resolvers.add(resolver);
