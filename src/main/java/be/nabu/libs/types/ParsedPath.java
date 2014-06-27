@@ -27,7 +27,12 @@ public class ParsedPath {
 			// an index reference must end with "]"
 			if (!name.endsWith("]"))
 				throw new IllegalArgumentException("The path " + path + " contains an indexed field without closing tag");
-			index = name.substring(indexOfSeparator + 1, name.length() - 1);
+			index = name.substring(indexOfSeparator + 1, name.length() - 1).trim();
+			// though we don't really need it, it is customary to wrap strings in quotes
+			// this allows for familiar expressions
+			if (index.startsWith("\"") && index.endsWith("\"")) {
+				index = index.substring(1, index.length() - 1);
+			}
 			name = name.substring(0, indexOfSeparator);
 		}
 	}
