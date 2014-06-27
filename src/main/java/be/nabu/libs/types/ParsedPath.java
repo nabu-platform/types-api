@@ -3,7 +3,7 @@ package be.nabu.libs.types;
 public class ParsedPath {
 	
 	private String name, childPath;
-	private Integer index;
+	private String index;
 	
 	public ParsedPath(String path) {
 		parse(path);
@@ -27,7 +27,7 @@ public class ParsedPath {
 			// an index reference must end with "]"
 			if (!name.endsWith("]"))
 				throw new IllegalArgumentException("The path " + path + " contains an indexed field without closing tag");
-			index = new Integer(name.substring(indexOfSeparator + 1, name.length() - 1));
+			index = name.substring(indexOfSeparator + 1, name.length() - 1);
 			name = name.substring(0, indexOfSeparator);
 		}
 	}
@@ -39,7 +39,7 @@ public class ParsedPath {
 		return childPath == null ? null : new ParsedPath(childPath);
 	}
 	
-	public Integer getIndex() {
+	public String getIndex() {
 		return index;
 	}
 

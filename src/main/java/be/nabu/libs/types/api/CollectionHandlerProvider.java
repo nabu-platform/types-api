@@ -2,7 +2,11 @@ package be.nabu.libs.types.api;
 
 import java.util.Collection;
 
-public interface CollectionHandlerProvider<T> {
+/**
+ * This handles a collection of type T (e.g. a java.util.List)
+ * The "V" indicates the type of value needed (e.g. Integer)
+ */
+public interface CollectionHandlerProvider<T, V> {
 	/**
 	 * You get the specific definition class in case you need more information
 	 * For example an array handler would need to know the actual type definition
@@ -22,7 +26,7 @@ public interface CollectionHandlerProvider<T> {
 	 * @param index
 	 * @param value
 	 */
-	public T set(T collection, int index, Object value);
+	public T set(T collection, V index, Object value);
 	
 	/**
 	 * Retrieve a specific value from a collection
@@ -30,7 +34,7 @@ public interface CollectionHandlerProvider<T> {
 	 * @param index
 	 * @return
 	 */
-	public Object get(T collection, int index);
+	public Object get(T collection, V index);
 	
 	/**
 	 * Deletes a specific value from a collection, returning the new collection (if any)
@@ -38,7 +42,7 @@ public interface CollectionHandlerProvider<T> {
 	 * @param index
 	 * @return
 	 */
-	public T delete(T collection, int index);
+	public T delete(T collection, V index);
 	
 	/**
 	 * The class that it can handle. Note that this likely also applies to subclasses
@@ -51,4 +55,11 @@ public interface CollectionHandlerProvider<T> {
 	 * @return
 	 */
 	public Collection<?> getAsCollection(T collection);
+	
+	/**
+	 * The index has to be marshallable/unmarshallable
+	 * This is because the paths that we use are always strings
+	 */
+	public V unmarshalIndex(String index);
+	public String marshalIndex(V index);
 }

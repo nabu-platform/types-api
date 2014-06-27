@@ -1,5 +1,5 @@
 package be.nabu.libs.types.api;
 
 public interface CollectionHandler {
-	public <T> CollectionHandlerProvider<T> getHandler(Class<T> clazz);
+	public <T, V> CollectionHandlerProvider<T, V> getHandler(Class<T> clazz);
 }

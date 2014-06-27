@@ -23,7 +23,7 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	
 	@Override
 	public SimpleType<?> getSimpleType(String namespace, String name) {
-		return simpleTypes.containsKey(namespace)
+		return simpleTypes.containsKey(namespace) && simpleTypes.get(namespace).containsKey(name)
 			? simpleTypes.get(namespace).get(name)
 			: getNestedSimpleType(namespace, name);
 	}
@@ -39,7 +39,7 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	
 	@Override
 	public ComplexType getComplexType(String namespace, String name) {
-		return complexTypes.containsKey(namespace)
+		return complexTypes.containsKey(namespace) && complexTypes.get(namespace).containsKey(name)
 			? complexTypes.get(namespace).get(name)
 			: getNestedComplexType(namespace, name);
 	}
@@ -55,7 +55,7 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	
 	@Override
 	public Element<?> getElement(String namespace, String name) {
-		return elements.containsKey(namespace)
+		return elements.containsKey(namespace) && elements.get(namespace).containsKey(name)
 			? elements.get(namespace).get(name)
 			: getNestedElement(namespace, name);
 	}
@@ -118,17 +118,23 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 
 	@Override
 	public List<SimpleType<?>> getSimpleTypes(String namespace) {
-		return new ArrayList<SimpleType<?>>(simpleTypes.get(namespace).values());
+		return simpleTypes.containsKey(namespace)
+			? new ArrayList<SimpleType<?>>(simpleTypes.get(namespace).values())
+			: new ArrayList<SimpleType<?>>();
 	}
 
 	@Override
 	public List<ComplexType> getComplexTypes(String namespace) {
-		return new ArrayList<ComplexType>(complexTypes.get(namespace).values());
+		return complexTypes.containsKey(namespace) 
+			? new ArrayList<ComplexType>(complexTypes.get(namespace).values())
+			: new ArrayList<ComplexType>();
 	}
 
 	@Override
 	public List<Element<?>> getElements(String namespace) {
-		return new ArrayList<Element<?>>(elements.get(namespace).values());
+		return elements.containsKey(namespace) 
+			? new ArrayList<Element<?>>(elements.get(namespace).values())
+			: new ArrayList<Element<?>>();
 	}
 
 }
