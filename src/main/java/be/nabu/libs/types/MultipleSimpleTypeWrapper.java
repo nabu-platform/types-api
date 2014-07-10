@@ -2,7 +2,7 @@ package be.nabu.libs.types;
 
 import java.util.List;
 
-import be.nabu.libs.types.api.SimpleType;
+import be.nabu.libs.types.api.DefinedSimpleType;
 import be.nabu.libs.types.api.SimpleTypeWrapper;
 
 public class MultipleSimpleTypeWrapper implements SimpleTypeWrapper {
@@ -14,8 +14,8 @@ public class MultipleSimpleTypeWrapper implements SimpleTypeWrapper {
 	}
 	
 	@Override
-	public <T> SimpleType<T> wrap(Class<T> object) {
-		SimpleType<T> wrapped = null;
+	public <T> DefinedSimpleType<T> wrap(Class<T> object) {
+		DefinedSimpleType<T> wrapped = null;
 		for (SimpleTypeWrapper wrapper : wrappers) {
 			wrapped = wrapper.wrap(object);
 			if (wrapped != null)
@@ -23,5 +23,4 @@ public class MultipleSimpleTypeWrapper implements SimpleTypeWrapper {
 		}
 		return wrapped;
 	}
-
 }

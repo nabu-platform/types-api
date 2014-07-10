@@ -2,8 +2,8 @@ package be.nabu.libs.types;
 
 import java.util.List;
 
+import be.nabu.libs.types.api.DefinedType;
 import be.nabu.libs.types.api.DefinedTypeResolver;
-import be.nabu.libs.types.api.Type;
 
 public class MultipleDefinedTypeResolver implements DefinedTypeResolver {
 
@@ -14,10 +14,10 @@ public class MultipleDefinedTypeResolver implements DefinedTypeResolver {
 	}
 	
 	@Override
-	public Type getType(String id) {
-		Type type = null;
+	public DefinedType resolve(String id) {
+		DefinedType type = null;
 		for (DefinedTypeResolver resolver : resolvers) {
-			type = resolver.getType(id);
+			type = resolver.resolve(id);
 			if (type != null)
 				break;
 		}

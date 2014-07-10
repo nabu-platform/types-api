@@ -38,7 +38,7 @@ public class TypeUtils {
 			if (converted != null)
 				return converted;
 		}
-		Type beanType = DefinedTypeResolverFactory.getInstance().getResolver().getType(beanClass.getName());
+		Type beanType = DefinedTypeResolverFactory.getInstance().getResolver().resolve(beanClass.getName());
 		// it is a valid subset, create a proxy
 		if (isSubset(new BaseTypeInstance(content.getType()), new BaseTypeInstance(beanType)))
 			return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?> [] { beanClass, ComplexContentConvertible.class }, new ComplexContentInvocationHandler(content));

@@ -1,8 +1,8 @@
 package be.nabu.libs.types;
 
+import be.nabu.libs.types.api.DefinedType;
 import be.nabu.libs.types.api.DefinedTypeResolver;
 import be.nabu.libs.types.api.SimpleTypeWrapper;
-import be.nabu.libs.types.api.Type;
 
 public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 
@@ -13,7 +13,7 @@ public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 	}
 	
 	@Override
-	public Type getType(String id) {
+	public DefinedType resolve(String id) {
 		try {
 			// if there is a simple type that can handle it, wrap it and send it back
 			return simpleTypeWrapper == null ? null : simpleTypeWrapper.wrap(Class.forName(id));

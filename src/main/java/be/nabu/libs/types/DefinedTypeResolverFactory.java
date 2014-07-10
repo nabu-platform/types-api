@@ -2,7 +2,6 @@ package be.nabu.libs.types;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import be.nabu.libs.types.api.DefinedTypeResolver;
 
@@ -16,17 +15,14 @@ public class DefinedTypeResolverFactory {
 		return instance;
 	}
 	
-	private List<DefinedTypeResolver> resolvers = new ArrayList<DefinedTypeResolver>();
+	private List<DefinedTypeResolver> resolvers = new ArrayList<DefinedTypeResolver>(); {
+		resolvers.add(new SPIDefinedTypeResolver());
+		// it will first try to resolve it as a simple type
+		// this will take care of e.g. boolean, string,...
+		resolvers.add(new DefinedSimpleTypeResolver(SimpleTypeWrapperFactory.getInstance().getWrapper()));
+	}
 	
 	public DefinedTypeResolver getResolver() {
-		if (resolvers.isEmpty()) {
-			// it will first try to resolve it as a simple type
-			// this will take care of e.g. boolean, string,...
-			resolvers.add(new DefinedSimpleTypeResolver(SimpleTypeWrapperFactory.getInstance().getWrapper()));
-			ServiceLoader<DefinedTypeResolver> serviceLoader = ServiceLoader.load(DefinedTypeResolver.class);
-			for (DefinedTypeResolver resolver : serviceLoader)
-				resolvers.add(resolver);
-		}
 		return new MultipleDefinedTypeResolver(resolvers);
 	}
 	
