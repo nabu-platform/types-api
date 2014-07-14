@@ -15,14 +15,15 @@ public class DefinedTypeResolverFactory {
 		return instance;
 	}
 	
-	private List<DefinedTypeResolver> resolvers = new ArrayList<DefinedTypeResolver>(); {
-		resolvers.add(new SPIDefinedTypeResolver());
-		// it will first try to resolve it as a simple type
-		// this will take care of e.g. boolean, string,...
-		resolvers.add(new DefinedSimpleTypeResolver(SimpleTypeWrapperFactory.getInstance().getWrapper()));
-	}
+	private List<DefinedTypeResolver> resolvers = new ArrayList<DefinedTypeResolver>();
 	
 	public DefinedTypeResolver getResolver() {
+		if (resolvers.isEmpty()) {
+			resolvers.add(new SPIDefinedTypeResolver());
+			// it will first try to resolve it as a simple type
+			// this will take care of e.g. boolean, string,...
+			resolvers.add(new DefinedSimpleTypeResolver(SimpleTypeWrapperFactory.getInstance().getWrapper()));
+		}
 		return new MultipleDefinedTypeResolver(resolvers);
 	}
 	
