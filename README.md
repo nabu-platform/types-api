@@ -274,9 +274,118 @@ This will also print out a validation error:
 
 ## Data Binding
 
-A data structure is only as useful as the data you can put in it. To that end there are parsers and formatters for the types API. Currently two types are supported:
-- **XML**: there is transparent support for large XML documents meaning that if you bind an XML to say a structure and tomorrow it turns out that the XML documents can actually be quite large, all you need to do is change a configuration setting.
-- **Flat**: it also supports large flat files using the same method as the XML binding. Fixed length & delimiter based parsing are both supported.
+A data structure is only as useful as the data you can put in it. To that end there are parsers and formatters for the types API. Currently three types are supported:
+
+- **XML**: the XML binding (especially when marshalling) has a lot of configurable features that allow you to tweak the XML to something the other party can parse. Additionally there is support for xsi:type which can be used (if indicated) to use extensions in the XML
+- **Flat**: Fixed length & delimiter based parsing are both supported.
+- **JSON**: the json binding is currently used mostly for http interfaces
+
+All current bindings have **transparant support for large documents**. 
+For example suppose you have an XML today from a customer and it's 100kb, you bind it to a java bean and perform your business logic.
+Over time business requirements change, contracts change, so maybe a year later that same XML has grown rather big, say 500meg.
+
+Most frameworks will require a rewrite of your logic, for example if you are doing pure java parsing, you will need to switch from dom parsing to sax/stax parsing. 
+In webmethods you will have to switch to streaming parsing potentially impacting a lot of code.
+
+The bindings provided here however let you handle this with a configuration tweak.
+
+The original code before the document was large:
+
+```java
+Company result = TypeUtils.getAsBean(binding.unmarshal(input, new Window[0]), Company.class);
+```
+
+Code once the document is large:
+
+```java
+Company result = TypeUtils.getAsBean(binding.unmarshal(input, new Window[] { new Window("company/employees", 3, 3) }), Company.class);
+```
+
+As you can see, we set a window (**note**: multiple and nested windows are supported).
+This tells the code that for the path "company/employees" (which must be a list) you want to have maximum 3 items in memory and each time the user goes past the limit (e.g. requests number 4) that he must load a batch of 3.
+You can tweak the settings of the window to get optimal performance at the cost of memory or optimal memory use at the cost of performance.
+
+The upside is also that (unlike most large document parsing), all the tooling that uses this API does not need to be aware of it.
+For example the evaluator will happily evaluate its rules over a large document although of course this might take a bit longer.
+
+Even though the path you define in the window vaguely resembles xpath, it is not related to xml: it defines the path in the target type (Company.class here) where the large list is expected.
+This means that for flat files the window definition looks **exactly the same**.
+
+### Flat file example
+
+Whilst XML & json binding are rather straight forward, the flat binding is of course a different beast. This example comes from the testcase for flat bindings.
+
+Suppose you have these java beans:
+
+```java
+public class Company {
+	private String name, unit, address, billingNumber;
+	private List<Employee> employees;
+}
+
+public static class Employee {
+	private String id, firstName, lastName;
+	private Integer age;
+	private Date startDay;
+}
+```
+
+And you have this simple csv:
+
+```
+Company,Nabu,Organizational
+0,John0,Doe0,31
+1,John1,Doe1,57,2013/12/03
+2,John2,Doe2,50
+3,John3,Doe3,57
+4,John4,Doe4,35
+5,John5,Doe5,19
+6,John6,Doe6,21
+7,John7,Doe7,43
+8,John8,Doe8,40
+9,John9,Doe9,31
+10,John10,Doe10,60
+11,John11,Doe11,48
+12,John12,Doe12,35
+13,John13,Doe13,56
+14,John14,Doe14,44
+15,John15,Doe15,48
+16,John16,Doe16,27
+17,John17,Doe17,28
+18,John18,Doe18,26
+19,John19,Doe19,47
+20,John20,Doe20,36
+21,John21,Doe21,34
+22,John22,Doe22,31
+23,John23,Doe23,31
+Nabu HQ,BE666-66-66
+```
+
+You need to tell the binding how the csv maps to the type. This can be expressed using XML:
+
+```xml
+<binding complexType="be.nabu.libs.types.binding.flat.Company">
+	<record separator="\n">
+		<field separator="," fixed="Company"/>
+		<field separator="," map="@name"/>
+		<field map="@unit"/>
+	</record>
+	<record separator="\n" map="employees" >
+		<field separator="," map="@id" match="[0-9]+" />
+		<field separator="," map="firstName"/>
+		<field separator="," map="lastName"/>
+		<field separator="," map="age" match="[0-9]+" canEnd="true" />
+		<field map="startDay" formatter="be.nabu.libs.types.simple.Date" format="yyyy/MM/dd"/>
+	</record>
+	<record separator="\n">
+		<field separator="," map="address" format="wtf"/>
+		<field map="billingNumber"/>
+	</record>
+</binding>
+```
+
+Note that the "fixed" and "match" attributes are used for record identification.
+Only records and fields with a "map" attribute are actually mapped to the target type.
 
 ## Conversions
 
