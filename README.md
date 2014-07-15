@@ -301,15 +301,16 @@ Code once the document is large:
 Company result = TypeUtils.getAsBean(binding.unmarshal(input, new Window[] { new Window("company/employees", 3, 3) }), Company.class);
 ```
 
-As you can see, we set a window (**note**: multiple and nested windows are supported).
+As you can see, we set a window.
 This tells the code that for the path "company/employees" (which must be a list) you want to have maximum 3 items in memory and each time the user goes past the limit (e.g. requests number 4) that he must load a batch of 3.
-You can tweak the settings of the window to get optimal performance at the cost of memory or optimal memory use at the cost of performance.
 
-The upside is also that (unlike most large document parsing), all the tooling that uses this API does not need to be aware of it.
-For example the evaluator will happily evaluate its rules over a large document although of course this might take a bit longer.
+The advantages compared to existing binding frameworks:
 
-Even though the path you define in the window vaguely resembles xpath, it is not related to xml: it defines the path in the target type (Company.class here) where the large list is expected.
-This means that for flat files the window definition looks **exactly the same**.
+- Multiple and nested windows are supported
+- You can tweak the settings of the window to get optimal performance at the cost of memory or optimal memory use at the cost of performance.
+- All the tooling that uses this API works just the same on a large document as it does on a smaller one because from the outside there is no functional difference.
+- You retain contextual awareness. You know how many records there are in the large list, you get access to data after the large list and you have random access to the entire list.
+- Even though the path you define in the window vaguely resembles xpath, it is not related to xml: it defines the path in the target type (Company.class here) where the large list is expected. This means that for flat files the window definition looks **exactly the same**.
 
 ### Flat file example
 
