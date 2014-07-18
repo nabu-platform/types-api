@@ -48,6 +48,18 @@ public class ParsedPath {
 		return index;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setChildPath(String childPath) {
+		this.childPath = childPath;
+	}
+
+	public void setIndex(String index) {
+		this.index = index;
+	}
+
 	@Override
 	public String toString() {
 		return name + (index == null ? "" : "[" + index + "]") + (childPath == null ? "" : "/" + childPath);
