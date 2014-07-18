@@ -2,7 +2,8 @@ package be.nabu.libs.types;
 
 public class ParsedPath {
 	
-	private String name, childPath;
+	private String name;
+	private ParsedPath childPath;
 	private String index;
 	
 	public ParsedPath(String path) {
@@ -17,7 +18,7 @@ public class ParsedPath {
 		// it has a child
 		if (indexOfSeparator >= 0) {
 			name = path.substring(0, indexOfSeparator);
-			childPath = path.substring(indexOfSeparator + 1);
+			childPath = new ParsedPath(path.substring(indexOfSeparator + 1));
 		}
 		else
 			name = path;
@@ -41,7 +42,7 @@ public class ParsedPath {
 	}
 	
 	public ParsedPath getChildPath() {
-		return childPath == null ? null : new ParsedPath(childPath);
+		return childPath;
 	}
 	
 	public String getIndex() {
@@ -52,7 +53,7 @@ public class ParsedPath {
 		this.name = name;
 	}
 
-	public void setChildPath(String childPath) {
+	public void setChildPath(ParsedPath childPath) {
 		this.childPath = childPath;
 	}
 
