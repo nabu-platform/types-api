@@ -19,10 +19,10 @@ public class DefinedTypeResolverFactory {
 	
 	public DefinedTypeResolver getResolver() {
 		if (resolvers.isEmpty()) {
-			resolvers.add(new SPIDefinedTypeResolver());
 			// it will first try to resolve it as a simple type
 			// this will take care of e.g. boolean, string,...
 			resolvers.add(new DefinedSimpleTypeResolver(SimpleTypeWrapperFactory.getInstance().getWrapper()));
+			resolvers.add(new SPIDefinedTypeResolver());
 		}
 		return new MultipleDefinedTypeResolver(resolvers);
 	}

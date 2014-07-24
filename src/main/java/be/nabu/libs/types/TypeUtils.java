@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import be.nabu.libs.property.ValueUtils;
@@ -30,6 +32,23 @@ import be.nabu.libs.validator.api.ValidationMessage.Severity;
 import be.nabu.libs.validator.api.Validator;
 
 public class TypeUtils {
+	
+	private static Map<Class<?>, Class<?>> boxedTypes = new HashMap<Class<?>, Class<?>>();
+	
+	static {
+		boxedTypes.put(boolean.class, Boolean.class);
+		boxedTypes.put(byte.class, Byte.class);
+		boxedTypes.put(short.class, Short.class);
+		boxedTypes.put(char.class, Character.class);
+		boxedTypes.put(int.class, Integer.class);
+		boxedTypes.put(long.class, Long.class);
+		boxedTypes.put(float.class, Float.class);
+	    boxedTypes.put(double.class, Double.class);
+	}
+	
+	public static Class<?> box(Class<?> clazz) {
+		return clazz.isPrimitive() ? boxedTypes.get(clazz) : clazz;
+	}
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T getAsBean(ComplexContent content, Class<T> beanClass) {
