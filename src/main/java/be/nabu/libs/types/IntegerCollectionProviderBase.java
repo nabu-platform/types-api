@@ -1,5 +1,9 @@
 package be.nabu.libs.types;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import be.nabu.libs.types.api.CollectionHandlerProvider;
 
 public abstract class IntegerCollectionProviderBase<T> implements CollectionHandlerProvider<T, Integer> {
@@ -25,4 +29,11 @@ public abstract class IntegerCollectionProviderBase<T> implements CollectionHand
 		return index == null ? null : index.toString();
 	}
 
+	protected Collection<Integer> generateIndexes(int size) {
+		List<Integer> indexes = new ArrayList<Integer>();
+		for (int i = 0; i < size; i++) {
+			indexes.add(i);
+		}
+		return indexes;
+	}
 }

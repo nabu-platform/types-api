@@ -57,6 +57,12 @@ public interface CollectionHandlerProvider<T, V> {
 	public Collection<?> getAsCollection(T collection);
 	
 	/**
+	 * Returns the indexes as a collection, you can then repeatedly call get()
+	 * @return
+	 */
+	public Collection<V> getIndexes(T collection);
+	
+	/**
 	 * The index has to be marshallable/unmarshallable
 	 * This is because the paths that we use are always strings
 	 */
