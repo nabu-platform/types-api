@@ -138,8 +138,12 @@ public class TypeUtils {
 		return new ComplexTypeValidator(type);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static boolean isSubset(TypeInstance subsetInstance, TypeInstance broaderInstance) {
+		return isSubset(subsetInstance, broaderInstance, new HashMap<ComplexType, List<ComplexType>>());
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static boolean isSubset(TypeInstance subsetInstance, TypeInstance broaderInstance, Map<ComplexType, List<ComplexType>> alreadyChecked) {
 		// we need to check all the properties of the broader instance
 		for (Property<?> property : broaderInstance.getType().getSupportedProperties(subsetInstance.getProperties())) {
 			Object subsetValue = ValueUtils.getValue(property, subsetInstance.getProperties());
@@ -160,11 +164,20 @@ public class TypeUtils {
 		if (subsetInstance.getType() instanceof ComplexType) {
 			if (!(broaderInstance.getType() instanceof ComplexType))
 				return false;
+			if (!alreadyChecked.containsKey(subsetInstance.getType())) {
+				alreadyChecked.put((ComplexType) subsetInstance.getType(), new ArrayList<ComplexType>());
+			}
+			if (alreadyChecked.get(subsetInstance.getType()).contains(broaderInstance.getType())) {
+				return true;
+			}
+			else {
+				alreadyChecked.get(subsetInstance.getType()).add((ComplexType) broaderInstance.getType());
+			}
 			for (Element<?> broaderChild : getAllChildren((ComplexType) broaderInstance.getType())) {
 				Element<?> subsetChild = ((ComplexType) subsetInstance.getType()).get(broaderChild.getName());
 				if (subsetChild == null)
 					return false;
-				else if (!isSubset(subsetChild, broaderChild))
+				else if (!isSubset(subsetChild, broaderChild, alreadyChecked))
 					return false;
 			}
 		}
