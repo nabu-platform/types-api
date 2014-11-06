@@ -7,6 +7,6 @@
 		bind="setHandler"
 		unbind="unsetHandler"
 		cardinality="0..1"
-		policy="static"/>
+		policy="dynamic"/>
 		
 </scr:component>

@@ -20,7 +20,6 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>1.0.0</Bundle-Version>
-						<Private-Package>be.nabu.libs.types</Private-Package>
 						<Export-Package>${project.groupId}.api,${project.groupId}</Export-Package>
 						<Service-Component>OSGI-INF/*.xml</Service-Component>
 					</instructions>

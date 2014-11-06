@@ -7,6 +7,6 @@
 		bind="addResolver"
 		unbind="removeResolver"
 		cardinality="0..n"
-		policy="static"/>
+		policy="dynamic"/>
 		
 </scr:component>
