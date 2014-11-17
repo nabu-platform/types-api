@@ -109,6 +109,10 @@ public class TypeUtils {
 			return null;
 	}
 	
+	public static boolean isExtension(Type possibleExtension, Type fromParent) {
+		return possibleExtension.equals(fromParent) || !getUpcastPath(possibleExtension, fromParent).isEmpty();
+	}
+	
 	public static List<Type> getUpcastPath(Type fromChildType, Type toParentType) {		
 		List<Type> path = new ArrayList<Type>();
 		
@@ -144,44 +148,53 @@ public class TypeUtils {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static boolean isSubset(TypeInstance subsetInstance, TypeInstance broaderInstance, Map<ComplexType, List<ComplexType>> alreadyChecked) {
-		// we need to check all the properties of the broader instance
-		for (Property<?> property : broaderInstance.getType().getSupportedProperties(subsetInstance.getProperties())) {
-			Object subsetValue = ValueUtils.getValue(property, subsetInstance.getProperties());
-			Object broaderValue = ValueUtils.getValue(property, broaderInstance.getProperties());
-
-			// use the available subset method
-			if (property instanceof ComparableProperty) {
-				if (!((ComparableProperty) property).isSubset(subsetValue, broaderValue))
+		// only complex types can be completely unrelated subsets of one another
+		// simple types can be subsets, but only if they are directly related to the original, otherwise you will get classcast exceptions at some point
+		// this is because complex types are exposed through the generic ComplexContent interface while simple types are actual java objects like java.lang.String
+		if ((subsetInstance.getType() instanceof ComplexType && broaderInstance.getType() instanceof ComplexType)
+				|| (subsetInstance.getType() instanceof SimpleType && broaderInstance.getType() instanceof SimpleType && isExtension(subsetInstance.getType(), broaderInstance.getType()))) {
+			// we need to check all the properties of the broader instance
+			for (Property<?> property : broaderInstance.getType().getSupportedProperties(subsetInstance.getProperties())) {
+				Object subsetValue = ValueUtils.getValue(property, subsetInstance.getProperties());
+				Object broaderValue = ValueUtils.getValue(property, broaderInstance.getProperties());
+	
+				// use the available subset method
+				if (property instanceof ComparableProperty) {
+					if (!((ComparableProperty) property).isSubset(subsetValue, broaderValue))
+						return false;
+				}
+				// they must both be null or both be the same
+				else if (subsetValue == null ^ broaderValue == null || (subsetValue != null && !subsetValue.equals(broaderValue)))
+					return false;
+				else if (subsetInstance.getType() instanceof SimpleType && !((SimpleType) broaderInstance.getType()).getInstanceClass().isAssignableFrom(((SimpleType) subsetInstance.getType()).getInstanceClass())) 
 					return false;
 			}
-			// they must both be null or both be the same
-			else if (subsetValue == null ^ broaderValue == null || (subsetValue != null && !subsetValue.equals(broaderValue)))
-				return false;
-			else if (subsetInstance.getType() instanceof SimpleType && !((SimpleType) broaderInstance.getType()).getInstanceClass().isAssignableFrom(((SimpleType) subsetInstance.getType()).getInstanceClass())) 
-				return false;
+			// if we are dealing with complex types, check all the children of the broader type
+			if (subsetInstance.getType() instanceof ComplexType) {
+				if (!(broaderInstance.getType() instanceof ComplexType))
+					return false;
+				if (!alreadyChecked.containsKey(subsetInstance.getType())) {
+					alreadyChecked.put((ComplexType) subsetInstance.getType(), new ArrayList<ComplexType>());
+				}
+				if (alreadyChecked.get(subsetInstance.getType()).contains(broaderInstance.getType())) {
+					return true;
+				}
+				else {
+					alreadyChecked.get(subsetInstance.getType()).add((ComplexType) broaderInstance.getType());
+				}
+				for (Element<?> broaderChild : getAllChildren((ComplexType) broaderInstance.getType())) {
+					Element<?> subsetChild = ((ComplexType) subsetInstance.getType()).get(broaderChild.getName());
+					if (subsetChild == null)
+						return false;
+					else if (!isSubset(subsetChild, broaderChild, alreadyChecked))
+						return false;
+				}
+			}
+			return true;
 		}
-		// if we are dealing with complex types, check all the children of the broader type
-		if (subsetInstance.getType() instanceof ComplexType) {
-			if (!(broaderInstance.getType() instanceof ComplexType))
-				return false;
-			if (!alreadyChecked.containsKey(subsetInstance.getType())) {
-				alreadyChecked.put((ComplexType) subsetInstance.getType(), new ArrayList<ComplexType>());
-			}
-			if (alreadyChecked.get(subsetInstance.getType()).contains(broaderInstance.getType())) {
-				return true;
-			}
-			else {
-				alreadyChecked.get(subsetInstance.getType()).add((ComplexType) broaderInstance.getType());
-			}
-			for (Element<?> broaderChild : getAllChildren((ComplexType) broaderInstance.getType())) {
-				Element<?> subsetChild = ((ComplexType) subsetInstance.getType()).get(broaderChild.getName());
-				if (subsetChild == null)
-					return false;
-				else if (!isSubset(subsetChild, broaderChild, alreadyChecked))
-					return false;
-			}
+		else {
+			return false;
 		}
-		return true;
 	}
 	
 	private static class RecursiveIterator implements Iterator<Element<?>> {
