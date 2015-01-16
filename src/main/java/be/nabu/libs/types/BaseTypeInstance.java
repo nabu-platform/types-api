@@ -17,6 +17,8 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 	
 	private Type type;
 	
+	private Value<?>[] cachedValues;
+	
 	public BaseTypeInstance(Type type, Value<?>...properties) {
 		this.type = type;
 		setProperty(properties);
@@ -41,17 +43,21 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 			else
 				properties.put(value.getProperty(), value);
 		}
+		cachedValues = null;
 	}
 
 	@Override
 	public Value<?>[] getProperties() {
-		Map<Property<?>, Value<?>> values = new HashMap<Property<?>, Value<?>>();
-		if (type != null) {
-			for (Value<?> value : type.getProperties())
-				values.put(value.getProperty(), value);
-			values.putAll(properties);
+		if (cachedValues == null) {
+			Map<Property<?>, Value<?>> values = new HashMap<Property<?>, Value<?>>();
+			if (type != null) {
+				for (Value<?> value : type.getProperties())
+					values.put(value.getProperty(), value);
+				values.putAll(properties);
+			}
+			cachedValues = values.values().toArray(new Value<?>[values.size()]);
 		}
-		return values.values().toArray(new Value<?>[values.size()]);
+		return cachedValues;
 	}
 
 	@Override
