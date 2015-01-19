@@ -11,6 +11,7 @@ public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 
 	private SimpleTypeWrapper simpleTypeWrapper;
 	private Map<String, Class<?>> resolvedClasses = new HashMap<String, Class<?>>();
+	private Map<String, DefinedType> definedTypes = new HashMap<String, DefinedType>();
 	
 	public DefinedSimpleTypeResolver(SimpleTypeWrapper simpleTypeWrapper) {
 		this.simpleTypeWrapper = simpleTypeWrapper;
@@ -26,6 +27,13 @@ public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 					}
 				}
 			}
+//			if (!definedTypes.containsKey(id)) {
+//				synchronized(definedTypes) {
+//					if (!definedTypes.containsKey(id)) {
+//						
+//					}
+//				}
+//			}
 			// if there is a simple type that can handle it, wrap it and send it back
 			return simpleTypeWrapper == null ? null : simpleTypeWrapper.wrap(resolvedClasses.get(id));
 		}
