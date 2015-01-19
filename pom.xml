@@ -4,7 +4,7 @@
 	<groupId>be.nabu.libs.types</groupId>
 	<artifactId>types-api</artifactId>
 	<packaging>bundle</packaging>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>types-api</name>
 	<url>http://maven.apache.org</url>
 	
