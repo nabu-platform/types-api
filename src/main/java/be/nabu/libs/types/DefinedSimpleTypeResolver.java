@@ -10,7 +10,6 @@ import be.nabu.libs.types.api.SimpleTypeWrapper;
 public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 
 	private SimpleTypeWrapper simpleTypeWrapper;
-	private Map<String, Class<?>> resolvedClasses = new HashMap<String, Class<?>>();
 	private Map<String, DefinedType> definedTypes = new HashMap<String, DefinedType>();
 	
 	public DefinedSimpleTypeResolver(SimpleTypeWrapper simpleTypeWrapper) {
@@ -20,22 +19,15 @@ public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 	@Override
 	public DefinedType resolve(String id) {
 		try {
-			if (!resolvedClasses.containsKey(id)) {
-				synchronized(resolvedClasses) {
-					if (!resolvedClasses.containsKey(id)) {
-						resolvedClasses.put(id, Thread.currentThread().getContextClassLoader().loadClass(id));
+			if (simpleTypeWrapper != null && !definedTypes.containsKey(id)) {
+				synchronized(definedTypes) {
+					if (!definedTypes.containsKey(id)) {
+						definedTypes.put(id, simpleTypeWrapper.wrap(Thread.currentThread().getContextClassLoader().loadClass(id)));
 					}
 				}
 			}
-//			if (!definedTypes.containsKey(id)) {
-//				synchronized(definedTypes) {
-//					if (!definedTypes.containsKey(id)) {
-//						
-//					}
-//				}
-//			}
 			// if there is a simple type that can handle it, wrap it and send it back
-			return simpleTypeWrapper == null ? null : simpleTypeWrapper.wrap(resolvedClasses.get(id));
+			return definedTypes.get(id);
 		}
 		catch (ClassNotFoundException e) {
 			// not a class, leave it to someone else
