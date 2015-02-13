@@ -23,32 +23,34 @@ public class SimpleTypeWrapperFactory {
 	@SuppressWarnings("unchecked")
 	public SimpleTypeWrapper getWrapper() {
 		if (wrappers.isEmpty()) {
-			try {
-				// let's try this with custom service loading based on a configuration
-				Class<?> clazz = getClass().getClassLoader().loadClass("be.nabu.utils.services.ServiceLoader");
-				Method declaredMethod = clazz.getDeclaredMethod("load", Class.class);
-				wrappers.addAll((List<SimpleTypeWrapper>) declaredMethod.invoke(null, SimpleTypeWrapper.class));
-			}
-			catch (ClassNotFoundException e) {
-				// ignore, the framework is not present
-			}
-			catch (NoSuchMethodException e) {
-				// corrupt framework?
-				throw new RuntimeException(e);
-			}
-			catch (SecurityException e) {
-				throw new RuntimeException(e);
-			}
-			catch (IllegalAccessException e) {
-				// ignore
-			}
-			catch (InvocationTargetException e) {
-				// ignore
-			}
-			if (wrappers.isEmpty()) {
-				ServiceLoader<SimpleTypeWrapper> serviceLoader = ServiceLoader.load(SimpleTypeWrapper.class);
-				for (SimpleTypeWrapper wrapper : serviceLoader) {
-					wrappers.add(wrapper);
+			synchronized(wrappers) {
+				try {
+					// let's try this with custom service loading based on a configuration
+					Class<?> clazz = getClass().getClassLoader().loadClass("be.nabu.utils.services.ServiceLoader");
+					Method declaredMethod = clazz.getDeclaredMethod("load", Class.class);
+					wrappers.addAll((List<SimpleTypeWrapper>) declaredMethod.invoke(null, SimpleTypeWrapper.class));
+				}
+				catch (ClassNotFoundException e) {
+					// ignore, the framework is not present
+				}
+				catch (NoSuchMethodException e) {
+					// corrupt framework?
+					throw new RuntimeException(e);
+				}
+				catch (SecurityException e) {
+					throw new RuntimeException(e);
+				}
+				catch (IllegalAccessException e) {
+					// ignore
+				}
+				catch (InvocationTargetException e) {
+					// ignore
+				}
+				if (wrappers.isEmpty()) {
+					ServiceLoader<SimpleTypeWrapper> serviceLoader = ServiceLoader.load(SimpleTypeWrapper.class);
+					for (SimpleTypeWrapper wrapper : serviceLoader) {
+						wrappers.add(wrapper);
+					}
 				}
 			}
 		}
