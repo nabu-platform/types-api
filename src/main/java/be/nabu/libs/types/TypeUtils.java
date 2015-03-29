@@ -23,6 +23,7 @@ import be.nabu.libs.types.api.ComplexContent;
 import be.nabu.libs.types.api.ComplexContentConvertible;
 import be.nabu.libs.types.api.ComplexType;
 import be.nabu.libs.types.api.Element;
+import be.nabu.libs.types.api.Marshallable;
 import be.nabu.libs.types.api.RestrictableComplexType;
 import be.nabu.libs.types.api.SimpleType;
 import be.nabu.libs.types.api.Type;
@@ -432,5 +433,18 @@ public class TypeUtils {
 			return Object.class;
 		}
 		
+	}
+	
+	public static boolean isMarshallable(Type type) {
+		boolean isMarshallable = true;
+		if (type instanceof ComplexType) {
+			for (Element<?> child : (ComplexType) type) {
+				isMarshallable &= isMarshallable(child.getType());
+			}
+		}
+		else {
+			isMarshallable &= type instanceof Marshallable;
+		}
+		return isMarshallable;
 	}
 }
