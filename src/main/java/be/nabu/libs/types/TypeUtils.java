@@ -28,6 +28,7 @@ import be.nabu.libs.types.api.RestrictableComplexType;
 import be.nabu.libs.types.api.SimpleType;
 import be.nabu.libs.types.api.Type;
 import be.nabu.libs.types.api.TypeInstance;
+import be.nabu.libs.validator.api.Validation;
 import be.nabu.libs.validator.api.ValidationMessage;
 import be.nabu.libs.validator.api.ValidationMessage.Severity;
 import be.nabu.libs.validator.api.Validator;
@@ -345,10 +346,10 @@ public class TypeUtils {
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
-		public List<ValidationMessage> validate(Object complexInstance) {
+		public List<Validation<?>> validate(Object complexInstance) {
 			ComplexContent instance = complexInstance instanceof ComplexContent ? (ComplexContent) complexInstance : convert(complexInstance);
 			
-			List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
+			List<Validation<?>> messages = new ArrayList<Validation<?>>();
 			if (instance.getType() != null) {
 				if (!instance.getType().equals(type) && getUpcastPath(instance.getType(), type).isEmpty())
 					messages.add(new ValidationMessage(Severity.ERROR, "The actual type " + instance.getType() + " is not related to the expected type " + type));
@@ -370,7 +371,7 @@ public class TypeUtils {
 			
 			// still continue with validation, could be on best effort basis if the type is unchecked
 			for (Element<?> child : getAllChildren(type)) {
-				List<ValidationMessage> childMessages = null;
+				List<? extends Validation<?>> childMessages = null;
 				Validator singleValidator = child.getType().createValidator(child.getProperties());
 				try {
 					Object value = instance.get((child instanceof Attribute ? "@" : "") + child.getName());
@@ -391,7 +392,7 @@ public class TypeUtils {
 								// stop if errors are detected, this allows for large docs to fail fast
 								if (stopOnError) {
 									boolean hasError = false;
-									for (ValidationMessage message : childMessages) {
+									for (Validation<?> message : childMessages) {
 										if (message.getSeverity() == Severity.ERROR) {
 											hasError = true;
 											break;
@@ -408,8 +409,9 @@ public class TypeUtils {
 						childMessages = singleValidator.validate(value);
 					
 					if (childMessages != null) {
-						for (ValidationMessage message : childMessages)
-							message.addContext(child.getName());
+						for (Validation message : childMessages) {
+							message.getContext().add(child.getName());
+						}
 						messages.addAll(childMessages);
 					}
 				}
