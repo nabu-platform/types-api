@@ -38,10 +38,15 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 	@Override
 	public void setProperty(Value<?>...values) {
 		for (Value<?> value : values) {
-			if (value.getProperty() instanceof PropertyWithDefault && value.getValue() != null && value.getValue().equals(((PropertyWithDefault<?>) value.getProperty()).getDefault()))
+			if (value.getValue() == null) {
 				properties.remove(value.getProperty());
-			else
+			}
+			else if (value.getProperty() instanceof PropertyWithDefault && value.getValue() != null && value.getValue().equals(((PropertyWithDefault<?>) value.getProperty()).getDefault())) {
+				properties.remove(value.getProperty());
+			}
+			else {
 				properties.put(value.getProperty(), value);
+			}
 		}
 		cachedValues = null;
 	}
