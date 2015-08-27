@@ -24,6 +24,7 @@ public class ComplexContentWrapperFactory {
 	public ComplexContentWrapper getWrapper() {
 		if (wrappers.isEmpty()) {
 			synchronized(wrappers) {
+				List<ComplexContentWrapper<?>> wrappers = new ArrayList<ComplexContentWrapper<?>>();
 				try {
 					// let's try this with custom service loading based on a configuration
 					Class<?> clazz = getClass().getClassLoader().loadClass("be.nabu.utils.services.ServiceLoader");
@@ -52,6 +53,7 @@ public class ComplexContentWrapperFactory {
 						wrappers.add(wrapper);
 					}
 				}
+				this.wrappers.addAll(wrappers);
 			}
 		}
 		return new MultipleComplexContentWrapper(wrappers);
