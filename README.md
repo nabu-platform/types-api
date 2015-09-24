@@ -45,6 +45,7 @@ Currently there are implementations for:
 - **Java**: there is support for exposing classes as complex types and wrapping instances in ComplexContent
 - **Webmethods**: there is support for exposing IData instances as ComplexContent and also support for exposing documents as ComplexType
 - **Structure**: a custom data format, the original (and reference) implementation. It is more flexible than java classes because it does not need compiling and allows for additional features (like special kinds of type casting)
+- **UML**: there is support for exposing all the classes in an XMI as complex types. If you use correct naming (or the provided baseTypes.xmi) there is support for all the properties and types available in XML Schema. It supports generalization and association in multiple ways (e.g. actual extension versus a reference to the other class, hierarchic structures vs flat structures,...)
 
 These types can be mixed and matched, for instance:
 
