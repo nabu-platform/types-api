@@ -34,4 +34,9 @@ public class MultipleComplexContentWrapper implements ComplexContentWrapper<Obje
 	public Class<Object> getInstanceClass() {
 		return Object.class;
 	}
+
+	public List<ComplexContentWrapper<?>> getWrappers() {
+		return wrappers;
+	}
+	
 }
