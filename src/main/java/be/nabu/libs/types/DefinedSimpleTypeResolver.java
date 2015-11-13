@@ -11,6 +11,12 @@ public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 
 	private SimpleTypeWrapper simpleTypeWrapper;
 	private Map<String, DefinedType> definedTypes = new HashMap<String, DefinedType>();
+	private ClassLoader[] loaders;
+	
+	public DefinedSimpleTypeResolver(SimpleTypeWrapper simpleTypeWrapper, ClassLoader...loaders) {
+		this.simpleTypeWrapper = simpleTypeWrapper;
+		this.loaders = loaders;
+	}
 	
 	public DefinedSimpleTypeResolver(SimpleTypeWrapper simpleTypeWrapper) {
 		this.simpleTypeWrapper = simpleTypeWrapper;
@@ -22,7 +28,21 @@ public class DefinedSimpleTypeResolver implements DefinedTypeResolver {
 			if (simpleTypeWrapper != null && !definedTypes.containsKey(id)) {
 				synchronized(definedTypes) {
 					if (!definedTypes.containsKey(id)) {
-						definedTypes.put(id, simpleTypeWrapper.wrap(Thread.currentThread().getContextClassLoader().loadClass(id)));
+						Class<?> loadClass = null;
+						if (loaders != null) {
+							for (ClassLoader loader : loaders) {
+								try {
+									loadClass = loader.loadClass(id);
+								}
+								catch (ClassNotFoundException e) {
+									continue;
+								}
+							}
+						}
+						if (loadClass == null) {
+							loadClass = Thread.currentThread().getContextClassLoader().loadClass(id);
+						}
+						definedTypes.put(id, simpleTypeWrapper.wrap(loadClass));
 					}
 				}
 			}
