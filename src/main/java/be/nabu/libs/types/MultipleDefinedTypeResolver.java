@@ -36,4 +36,8 @@ public class MultipleDefinedTypeResolver implements DefinedTypeResolver {
 		return definedTypes.get(id);
 	}
 
+	public List<DefinedTypeResolver> getResolvers() {
+		return resolvers;
+	}
+	
 }
