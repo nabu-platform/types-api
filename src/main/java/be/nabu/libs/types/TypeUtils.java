@@ -22,6 +22,7 @@ import be.nabu.libs.types.api.BeanConvertible;
 import be.nabu.libs.types.api.ComplexContent;
 import be.nabu.libs.types.api.ComplexContentConvertible;
 import be.nabu.libs.types.api.ComplexType;
+import be.nabu.libs.types.api.DefinedTypeResolver;
 import be.nabu.libs.types.api.Element;
 import be.nabu.libs.types.api.Marshallable;
 import be.nabu.libs.types.api.RestrictableComplexType;
@@ -52,14 +53,18 @@ public class TypeUtils {
 		return clazz.isPrimitive() ? boxedTypes.get(clazz) : clazz;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T> T getAsBean(ComplexContent content, Class<T> beanClass) {
+		return getAsBean(content, beanClass, DefinedTypeResolverFactory.getInstance().getResolver());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T getAsBean(ComplexContent content, Class<T> beanClass, DefinedTypeResolver resolver) {
 		if (content instanceof BeanConvertible) {
 			T converted = ((BeanConvertible) content).asBean(beanClass);
 			if (converted != null)
 				return converted;
 		}
-		Type beanType = DefinedTypeResolverFactory.getInstance().getResolver().resolve(beanClass.getName());
+		Type beanType = resolver.resolve(beanClass.getName());
 		// it is a valid subset, create a proxy
 		if (isSubset(new BaseTypeInstance(content.getType()), new BaseTypeInstance(beanType)))
 			return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?> [] { beanClass, ComplexContentConvertible.class }, new ComplexContentInvocationHandler(content));
