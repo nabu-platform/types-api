@@ -7,4 +7,5 @@ package be.nabu.libs.types.api;
  */
 public interface SimpleTypeWrapper {
 	public <T> DefinedSimpleType<T> wrap(Class<T> object);
+	public DefinedSimpleType<?> getByName(String name);
 }

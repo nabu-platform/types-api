@@ -23,4 +23,15 @@ public class MultipleSimpleTypeWrapper implements SimpleTypeWrapper {
 		}
 		return wrapped;
 	}
+
+	@Override
+	public DefinedSimpleType<?> getByName(String name) {
+		for (SimpleTypeWrapper wrapper : wrappers) {
+			DefinedSimpleType<?> byName = wrapper.getByName(name);
+			if (byName != null) {
+				return byName;
+			}
+		}
+		return null;
+	}
 }
