@@ -14,28 +14,34 @@ public class ParsedPath {
 		if (path.startsWith("/"))
 			throw new IllegalArgumentException("Can not use absolute paths");
 		
-		int indexOfSeparator = path.indexOf('/');
-		// it has a child
-		if (indexOfSeparator >= 0) {
-			name = path.substring(0, indexOfSeparator);
-			childPath = new ParsedPath(path.substring(indexOfSeparator + 1));
+		int indexOfSlashSeparator = path.indexOf('/');
+		int indexOfBracketSeparator = path.indexOf('[');
+		if (indexOfSlashSeparator >= 0 && indexOfSlashSeparator > indexOfBracketSeparator) {
+			int indexOfClosingBracketSeparator = path.indexOf(']');
+			indexOfSlashSeparator = path.indexOf('/', indexOfClosingBracketSeparator);
 		}
-		else
+		// it has a child
+		if (indexOfSlashSeparator >= 0) {
+			name = path.substring(0, indexOfSlashSeparator);
+			childPath = new ParsedPath(path.substring(indexOfSlashSeparator + 1));
+		}
+		else {
 			name = path;
+		}
+		indexOfBracketSeparator = name.indexOf('[');
 		// check if you want indexed access
-		indexOfSeparator = name.indexOf('[');
-		if (indexOfSeparator >= 0) {
+		if (indexOfBracketSeparator >= 0) {
 			// an index reference must end with "]"
 			if (!name.endsWith("]"))
-				throw new IllegalArgumentException("The path " + path + " contains an indexed field without closing tag");
-			index = name.substring(indexOfSeparator + 1, name.length() - 1).trim();
+				throw new IllegalArgumentException("The path " + path + " contains an indexed field without closing tag: " + name);
+			index = name.substring(indexOfBracketSeparator + 1, name.length() - 1).trim();
 			// though we don't really need it, it is customary to wrap strings in quotes
 			// this allows for familiar expressions
 			// disabled currently due to misleading
 //			if (index.startsWith("\"") && index.endsWith("\"")) {
 //				index = index.substring(1, index.length() - 1);
 //			}
-			name = name.substring(0, indexOfSeparator);
+			name = name.substring(0, indexOfBracketSeparator);
 		}
 	}
 	public String getName() {
