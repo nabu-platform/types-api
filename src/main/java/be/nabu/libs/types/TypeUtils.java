@@ -29,6 +29,7 @@ import be.nabu.libs.types.api.RestrictableComplexType;
 import be.nabu.libs.types.api.SimpleType;
 import be.nabu.libs.types.api.Type;
 import be.nabu.libs.types.api.TypeInstance;
+import be.nabu.libs.validator.api.ContextUpdatableValidation;
 import be.nabu.libs.validator.api.Validation;
 import be.nabu.libs.validator.api.ValidationMessage;
 import be.nabu.libs.validator.api.ValidationMessage.Severity;
@@ -415,7 +416,9 @@ public class TypeUtils {
 					
 					if (childMessages != null) {
 						for (Validation message : childMessages) {
-							message.getContext().add(child.getName());
+							if (message instanceof ContextUpdatableValidation) {
+								((ContextUpdatableValidation) message).addContext(child.getName());
+							}
 						}
 						messages.addAll(childMessages);
 					}
