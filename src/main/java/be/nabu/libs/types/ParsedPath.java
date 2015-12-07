@@ -12,7 +12,7 @@ public class ParsedPath {
 	
 	private void parse(String path) {		
 		if (path.startsWith("/"))
-			throw new IllegalArgumentException("Can not use absolute paths");
+			path = path.substring(1);
 		
 		int indexOfSlashSeparator = path.indexOf('/');
 		int indexOfBracketSeparator = path.indexOf('[');
