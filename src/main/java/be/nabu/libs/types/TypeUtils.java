@@ -356,6 +356,9 @@ public class TypeUtils {
 			ComplexContent instance = complexInstance instanceof ComplexContent ? (ComplexContent) complexInstance : convert(complexInstance);
 			
 			List<Validation<?>> messages = new ArrayList<Validation<?>>();
+			if (instance == null) {
+				return messages;
+			}
 			if (instance.getType() != null) {
 				if (!instance.getType().equals(type) && getUpcastPath(instance.getType(), type).isEmpty())
 					messages.add(new ValidationMessage(Severity.ERROR, "The actual type " + instance.getType() + " is not related to the expected type " + type));
