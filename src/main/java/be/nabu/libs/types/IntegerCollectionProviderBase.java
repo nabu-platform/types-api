@@ -36,4 +36,10 @@ public abstract class IntegerCollectionProviderBase<T> implements CollectionHand
 		}
 		return indexes;
 	}
+
+	@Override
+	public Class<Integer> getIndexClass() {
+		return Integer.class;
+	}
+	
 }

@@ -50,6 +50,11 @@ public interface CollectionHandlerProvider<T, V> {
 	public Class<T> getCollectionClass();
 	
 	/**
+	 * The indexes that it can handle
+	 */
+	public Class<V> getIndexClass();
+	
+	/**
 	 * Return as an actual collection of items
 	 * This allows collection-based validation
 	 * @return
