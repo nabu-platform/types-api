@@ -19,6 +19,8 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 	
 	private Value<?>[] cachedValues;
 	
+	private boolean maintainDefaultValues;
+	
 	public BaseTypeInstance(Type type, Value<?>...properties) {
 		this.type = type;
 		setProperty(properties);
@@ -41,7 +43,7 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 			if (value.getValue() == null) {
 				properties.remove(value.getProperty());
 			}
-			else if (value.getProperty() instanceof PropertyWithDefault && value.getValue() != null && value.getValue().equals(((PropertyWithDefault<?>) value.getProperty()).getDefault())) {
+			else if (!maintainDefaultValues && value.getProperty() instanceof PropertyWithDefault && value.getValue() != null && value.getValue().equals(((PropertyWithDefault<?>) value.getProperty()).getDefault())) {
 				properties.remove(value.getProperty());
 			}
 			else {
@@ -75,6 +77,13 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 	@Override
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public boolean isMaintainDefaultValues() {
+		return maintainDefaultValues;
+	}
+	public void setMaintainDefaultValues(boolean maintainDefaultValues) {
+		this.maintainDefaultValues = maintainDefaultValues;
 	}
 	
 }
