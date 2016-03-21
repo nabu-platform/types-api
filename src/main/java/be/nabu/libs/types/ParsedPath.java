@@ -1,16 +1,32 @@
 package be.nabu.libs.types;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ParsedPath {
 	
 	private String name;
 	private ParsedPath childPath;
 	private String index;
 	
-	public ParsedPath(String path) {
-		parse(path);
+	private static Map<String, ParsedPath> paths = new HashMap<String, ParsedPath>();
+	
+	public static ParsedPath parse(String path) {
+		if (!paths.containsKey(path)) {
+			synchronized(paths) {
+				if (!paths.containsKey(path)) {
+					paths.put(path, new ParsedPath(path));
+				}
+			}
+		}
+		return paths.get(path);
 	}
 	
-	private void parse(String path) {		
+	public ParsedPath(String path) {
+		parsePath(path);
+	}
+	
+	private void parsePath(String path) {		
 		if (path.startsWith("/"))
 			path = path.substring(1);
 		

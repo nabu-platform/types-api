@@ -73,14 +73,14 @@ public class TypeUtils {
 	}
 	
 	public static Element<?> getChild(ComplexType type, String path) {
-		return getChild(type, new ParsedPath(path), false);
+		return getChild(type, ParsedPath.parse(path), false);
 	}
 	
 	/**
 	 * A local child is a child that belongs to this type specifically, in other words it is not inherited from a parent
 	 */
 	public static Element<?> getLocalChild(ComplexType type, String name) {
-		ParsedPath parsed = new ParsedPath(name);
+		ParsedPath parsed = ParsedPath.parse(name);
 		if (parsed.getChildPath() != null)
 			throw new IllegalArgumentException(name + " does not point to a local child");
 		return getChild(type, parsed, true);
