@@ -318,7 +318,7 @@ public class TypeUtils {
 				content.set(name, args[0]);
 				return null;
 			}
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("Could not find method " + method + " in content: " + content);
 		}
 		
 	}
