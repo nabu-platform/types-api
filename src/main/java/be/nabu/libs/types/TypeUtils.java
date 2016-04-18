@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 import be.nabu.libs.property.ValueUtils;
 import be.nabu.libs.property.api.ComparableProperty;
 import be.nabu.libs.property.api.Property;
+import be.nabu.libs.property.api.Value;
 import be.nabu.libs.types.api.Attribute;
 import be.nabu.libs.types.api.BeanConvertible;
 import be.nabu.libs.types.api.ComplexContent;
@@ -89,11 +90,22 @@ public class TypeUtils {
 	private static Element<?> getChild(ComplexType type, ParsedPath path, boolean localOnly) {
 		Element<?> requestedChild = null;
 		// check if the child is one defined by this complex type
+		Element<?> aliasedChild = null;
 		for (Element<?> child : type) {
 			if (child.getName().equals(path.getName())) {
 				requestedChild = child;
 				break;
 			}
+			else {
+				for (Value<?> value : child.getProperties()) {
+					if (value.getProperty().getName().equals("alias") && path.getName().equals(value.getValue())) {
+						aliasedChild = child;
+					}
+				}
+			}
+		}
+		if (requestedChild == null) {
+			requestedChild = aliasedChild;
 		}
 		// if the type supports restrictions, check if it restricts the parent type
 		if (type instanceof RestrictableComplexType) {
