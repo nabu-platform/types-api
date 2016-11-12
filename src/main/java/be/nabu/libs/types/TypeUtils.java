@@ -409,6 +409,7 @@ public class TypeUtils {
 						else
 							childMessages = new ArrayList<ValidationMessage>();
 						if (singleValidator != null) {
+							int index = 0;
 							for (Object object : collection) {
 								// stop if errors are detected, this allows for large docs to fail fast
 								if (stopOnError) {
@@ -422,7 +423,13 @@ public class TypeUtils {
 									if (hasError)
 										break;
 								}
-								childMessages.addAll(singleValidator.validate(object));
+								List localMessages = singleValidator.validate(object);
+								for (Validation message : (List<Validation<?>>) localMessages) {
+									if (message instanceof ContextUpdatableValidation) {
+										((ContextUpdatableValidation) message).addContext(Integer.toString(index++));
+									}
+								}
+								childMessages.addAll(localMessages);
 							}
 						}
 					}
