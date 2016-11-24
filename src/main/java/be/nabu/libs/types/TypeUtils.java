@@ -426,9 +426,10 @@ public class TypeUtils {
 								List localMessages = singleValidator.validate(object);
 								for (Validation message : (List<Validation<?>>) localMessages) {
 									if (message instanceof ContextUpdatableValidation) {
-										((ContextUpdatableValidation) message).addContext(Integer.toString(index++));
+										((ContextUpdatableValidation) message).addContext(Integer.toString(index));
 									}
 								}
+								index++;
 								childMessages.addAll(localMessages);
 							}
 						}
