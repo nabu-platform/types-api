@@ -62,6 +62,14 @@ public interface CollectionHandlerProvider<T, V> {
 	public Collection<?> getAsCollection(T collection);
 	
 	/**
+	 * This returns the collection as an iterable where we can stream over the data
+	 * By default it uses the getAsCollection()
+	 */
+	public default Iterable<?> getAsIterable(T collection) {
+		return getAsCollection(collection);
+	}
+	
+	/**
 	 * Returns the indexes as a collection, you can then repeatedly call get()
 	 * @return
 	 */
