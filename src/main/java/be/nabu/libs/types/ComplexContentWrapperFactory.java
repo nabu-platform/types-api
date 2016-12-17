@@ -24,36 +24,38 @@ public class ComplexContentWrapperFactory {
 	public ComplexContentWrapper getWrapper() {
 		if (wrappers.isEmpty()) {
 			synchronized(wrappers) {
-				List<ComplexContentWrapper<?>> wrappers = new ArrayList<ComplexContentWrapper<?>>();
-				try {
-					// let's try this with custom service loading based on a configuration
-					Class<?> clazz = getClass().getClassLoader().loadClass("be.nabu.utils.services.ServiceLoader");
-					Method declaredMethod = clazz.getDeclaredMethod("load", Class.class);
-					wrappers.addAll((List<ComplexContentWrapper<?>>) declaredMethod.invoke(null, ComplexContentWrapper.class));
-				}
-				catch (ClassNotFoundException e) {
-					// ignore, the framework is not present
-				}
-				catch (NoSuchMethodException e) {
-					// corrupt framework?
-					throw new RuntimeException(e);
-				}
-				catch (SecurityException e) {
-					throw new RuntimeException(e);
-				}
-				catch (IllegalAccessException e) {
-					// ignore
-				}
-				catch (InvocationTargetException e) {
-					// ignore
-				}
 				if (wrappers.isEmpty()) {
-					ServiceLoader<ComplexContentWrapper> serviceLoader = ServiceLoader.load(ComplexContentWrapper.class);
-					for (ComplexContentWrapper<?> wrapper : serviceLoader) {
-						wrappers.add(wrapper);
+					List<ComplexContentWrapper<?>> wrappers = new ArrayList<ComplexContentWrapper<?>>();
+					try {
+						// let's try this with custom service loading based on a configuration
+						Class<?> clazz = getClass().getClassLoader().loadClass("be.nabu.utils.services.ServiceLoader");
+						Method declaredMethod = clazz.getDeclaredMethod("load", Class.class);
+						wrappers.addAll((List<ComplexContentWrapper<?>>) declaredMethod.invoke(null, ComplexContentWrapper.class));
 					}
+					catch (ClassNotFoundException e) {
+						// ignore, the framework is not present
+					}
+					catch (NoSuchMethodException e) {
+						// corrupt framework?
+						throw new RuntimeException(e);
+					}
+					catch (SecurityException e) {
+						throw new RuntimeException(e);
+					}
+					catch (IllegalAccessException e) {
+						// ignore
+					}
+					catch (InvocationTargetException e) {
+						// ignore
+					}
+					if (wrappers.isEmpty()) {
+						ServiceLoader<ComplexContentWrapper> serviceLoader = ServiceLoader.load(ComplexContentWrapper.class);
+						for (ComplexContentWrapper<?> wrapper : serviceLoader) {
+							wrappers.add(wrapper);
+						}
+					}
+					this.wrappers.addAll(wrappers);
 				}
-				this.wrappers.addAll(wrappers);
 			}
 		}
 		return new MultipleComplexContentWrapper(wrappers);
