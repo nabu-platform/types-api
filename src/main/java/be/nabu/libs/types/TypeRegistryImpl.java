@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import be.nabu.libs.types.api.ComplexType;
+import be.nabu.libs.types.api.DefinedType;
 import be.nabu.libs.types.api.Element;
 import be.nabu.libs.types.api.ModifiableTypeRegistry;
 import be.nabu.libs.types.api.SimpleType;
@@ -24,6 +25,7 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	private Map<String, Map<String, ComplexType>> complexTypes = new HashMap<String, Map<String, ComplexType>>();
 	private Map<String, Map<String, SimpleType<?>>> simpleTypes = new HashMap<String, Map<String, SimpleType<?>>>();
 	private List<TypeRegistry> registries = new ArrayList<TypeRegistry>();
+	private boolean useTypeIds;
 	
 	@Override
 	public SimpleType<?> getSimpleType(String namespace, String name) {
@@ -114,22 +116,24 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	@Override
 	public void register(ComplexType...types) {
 		for (ComplexType type : types) {
+			String name = useTypeIds && type instanceof DefinedType ? ((DefinedType) type).getId() : type.getName();
 			if (!this.complexTypes.containsKey(type.getNamespace()))
 				this.complexTypes.put(type.getNamespace(), new HashMap<String, ComplexType>());
-			if (this.complexTypes.get(type.getNamespace()).containsKey(type.getName()))
-				throw new IllegalArgumentException("The complexType " + type.getNamespace() + " # " + type.getName() + " already exists");
-			this.complexTypes.get(type.getNamespace()).put(type.getName(), type);
+			if (this.complexTypes.get(type.getNamespace()).containsKey(name))
+				throw new IllegalArgumentException("The complexType " + type.getNamespace() + " # " + name + " already exists");
+			this.complexTypes.get(type.getNamespace()).put(name, type);
 		}
 	}
 
 	@Override
 	public void register(SimpleType<?>...types) {
 		for (SimpleType<?> type : types) {
+			String name = useTypeIds && type instanceof DefinedType ? ((DefinedType) type).getId() : type.getName();
 			if (!this.simpleTypes.containsKey(type.getNamespace()))
 				this.simpleTypes.put(type.getNamespace(), new HashMap<String, SimpleType<?>>());
-			if (this.simpleTypes.get(type.getNamespace()).containsKey(type.getName()))
-				throw new IllegalArgumentException("The simpleType " + type.getNamespace() + " # " + type.getName() + " already exists");
-			this.simpleTypes.get(type.getNamespace()).put(type.getName(), type);
+			if (this.simpleTypes.get(type.getNamespace()).containsKey(name))
+				throw new IllegalArgumentException("The simpleType " + type.getNamespace() + " # " + name + " already exists");
+			this.simpleTypes.get(type.getNamespace()).put(name, type);
 		}
 	}
 
@@ -191,6 +195,14 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	}
 	public void setPrioritizeIncludes(boolean prioritizeIncludes) {
 		this.prioritizeIncludes = prioritizeIncludes;
+	}
+
+	public boolean isUseTypeIds() {
+		return useTypeIds;
+	}
+
+	public void setUseTypeIds(boolean useTypeIds) {
+		this.useTypeIds = useTypeIds;
 	}
 
 }
