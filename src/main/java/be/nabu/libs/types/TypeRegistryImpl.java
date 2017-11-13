@@ -141,6 +141,32 @@ public class TypeRegistryImpl implements ModifiableTypeRegistry {
 	public void register(TypeRegistry... registries) {
 		this.registries.addAll(Arrays.asList(registries));		
 	}
+	
+	public void unregister(ComplexType...types) {
+		for (ComplexType type : types) {
+			String name = useTypeIds && type instanceof DefinedType ? ((DefinedType) type).getId() : type.getName();
+			if (this.complexTypes.containsKey(type.getNamespace())) {
+				this.complexTypes.get(type.getNamespace()).remove(name);
+			}
+		}
+	}
+	
+	public void unregister(SimpleType<?>...types) {
+		for (SimpleType<?> type : types) {
+			String name = useTypeIds && type instanceof DefinedType ? ((DefinedType) type).getId() : type.getName();
+			if (this.simpleTypes.containsKey(type.getNamespace())) {
+				this.simpleTypes.get(type.getNamespace()).remove(name);
+			}
+		}
+	}
+	
+	public void unregister(Element<?>...elements) {
+		for (Element<?> element : elements) {
+			if (this.elements.containsKey(element.getNamespace())) {
+				this.elements.get(element.getNamespace()).remove(element.getName());
+			}
+		}
+	}
 
 	@Override
 	public Set<String> getNamespaces() {
