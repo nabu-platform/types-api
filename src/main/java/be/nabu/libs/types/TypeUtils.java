@@ -307,7 +307,7 @@ public class TypeUtils {
 		
 		@Override
 		public Object invoke(Object arg0, Method method, Object[] args) throws Throwable {
-			if (method.getName().equals("asComplexContent") && args.length == 0)
+			if (method.getName().equals("asComplexContent") && (args == null || args.length == 0))
 				return content;
 			else if (method.getName().startsWith("get")) {
 				// only methods that do not take parameters
@@ -329,6 +329,9 @@ public class TypeUtils {
 				String name = method.getName().substring(3).trim();
 				content.set(name, args[0]);
 				return null;
+			}
+			else if (method.getName().equals("toString") && (args == null || args.length == 0)) {
+				return "Proxy for: " + content;
 			}
 			throw new UnsupportedOperationException("Could not find method " + method + " in content: " + content);
 		}
