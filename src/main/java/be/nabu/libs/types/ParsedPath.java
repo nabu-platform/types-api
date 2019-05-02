@@ -30,11 +30,23 @@ public class ParsedPath {
 		if (path.startsWith("/"))
 			path = path.substring(1);
 		
-		int indexOfSlashSeparator = path.indexOf('/');
-		int indexOfBracketSeparator = path.indexOf('[');
-		if (indexOfSlashSeparator >= 0 && indexOfSlashSeparator > indexOfBracketSeparator) {
-			int indexOfClosingBracketSeparator = path.indexOf(']');
-			indexOfSlashSeparator = path.indexOf('/', indexOfClosingBracketSeparator);
+		int indexOfSlashSeparator = -1;
+		int depth = 0;
+		int indexOfBracketSeparator = -1;
+		for (int i = 0; i < path.length(); i++) {
+			if (path.charAt(i) == '/' && depth == 0) {
+				indexOfSlashSeparator = i;
+				break;
+			}
+			else if (path.charAt(i) == '[') {
+				if (depth == 0) {
+					indexOfBracketSeparator = i;
+				}
+				depth++;
+			}
+			else if (path.charAt(i) == ']') {
+				depth--;
+			}
 		}
 		// it has a child
 		if (indexOfSlashSeparator >= 0) {

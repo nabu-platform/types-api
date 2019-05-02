@@ -293,7 +293,7 @@ public class TypeUtils {
 					// nasty workaround for bean types
 					// the problem is with generics etc, it is hard to validate whether an override is correct, however because it is a java bean, we can assume the compiler checked it all and that it is indeed valid
 					// however we have no visibility of the bean type implementation at this point so...
-					if (!child.getType().getClass().getName().contains("BeanType")) {
+					if (!child.getType().getClass().getName().contains("BeanType") && !typeInPath.getClass().getName().contains("BeanType")) {
 						throw new IllegalStateException("A child type restricts a parent type with an invalid restriction for element: " + child.getName() + " in " + typeInPath);
 					}
 				}
