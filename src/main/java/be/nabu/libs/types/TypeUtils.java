@@ -123,8 +123,17 @@ public class TypeUtils {
 				throw new IllegalArgumentException("The child " + path.getName() + " is not a complex type and can not be recursed");
 		}
 		// not found in the current complex type, check if it is in an extended one
-		else if (!localOnly && type.getSuperType() != null && type.getSuperType() instanceof ComplexType)
+		else if (!localOnly && type.getSuperType() != null && type.getSuperType() instanceof ComplexType) {
+			// if we have a property that restricts from the parent, don't cascade
+			for (Value<?> value : type.getProperties()) {
+				if (value.getProperty().getName().equals("restrict") && value.getValue() instanceof String) {
+					if (Arrays.asList(value.getValue().toString().split("[\\s]*,[\\s]*")).indexOf(path.getName()) >= 0) {
+						return null;
+					}
+				}
+			}
 			return getChild((ComplexType) type.getSuperType(), path, localOnly);
+		}
 		else
 			return null;
 	}
@@ -287,16 +296,31 @@ public class TypeUtils {
 		Collections.reverse(path);
 		LinkedHashMap<String, Element<?>> children = new LinkedHashMap<String, Element<?>>();
 		for (ComplexType typeInPath : path) {
-			for (Element<?> child : typeInPath) {
-				// if a child type restricts a parent type, it MUST be cast-compatible
-				if (children.containsKey(child.getName()) && !child.getType().equals(children.get(child.getName()).getType()) && getUpcastPath(child.getType(), children.get(child.getName()).getType()).isEmpty()) {
-					// nasty workaround for bean types
-					// the problem is with generics etc, it is hard to validate whether an override is correct, however because it is a java bean, we can assume the compiler checked it all and that it is indeed valid
-					// however we have no visibility of the bean type implementation at this point so...
-					if (!child.getType().getClass().getName().contains("BeanType") && !typeInPath.getClass().getName().contains("BeanType")) {
-						throw new IllegalStateException("A child type restricts a parent type with an invalid restriction for element: " + child.getName() + " in " + typeInPath);
+			// first apply restrictions so you can do non-compatible types if necessary
+			// also: you don't want to be able to restrict your own children, just delete it
+			for (Value<?> value : typeInPath.getProperties()) {
+				if (value.getProperty().getName().equals("restrict") && value.getValue() != null) {
+					List<String> restricted = Arrays.asList(value.getValue().toString().split("[\\s]*,[\\s]*"));
+					Iterator<String> iterator = children.keySet().iterator();
+					while (iterator.hasNext()) {
+						if (restricted.indexOf(iterator.next()) >= 0) {
+							iterator.remove();
+						}
 					}
 				}
+			}
+			for (Element<?> child : typeInPath) {
+				// if a child type restricts a parent type, it MUST be cast-compatible
+				// @2019-09-03: let's be more lenient at this point. it is mostly when trying to express the types in for example XSD that this will cause issues
+				// so we move the responsibility of checking it to there as it poses no real problem for structures, json schema...
+//				if (children.containsKey(child.getName()) && !child.getType().equals(children.get(child.getName()).getType()) && getUpcastPath(child.getType(), children.get(child.getName()).getType()).isEmpty()) {
+//					// nasty workaround for bean types
+//					// the problem is with generics etc, it is hard to validate whether an override is correct, however because it is a java bean, we can assume the compiler checked it all and that it is indeed valid
+//					// however we have no visibility of the bean type implementation at this point so...
+//					if (!child.getType().getClass().getName().contains("BeanType") && !typeInPath.getClass().getName().contains("BeanType")) {
+//						throw new IllegalStateException("A child type restricts a parent type with an invalid restriction for element: " + child.getName() + " in " + typeInPath);
+//					}
+//				}
 				children.put(child.getName(), child);
 			}
 		}
