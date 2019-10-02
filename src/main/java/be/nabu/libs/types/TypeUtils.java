@@ -20,6 +20,7 @@ import be.nabu.libs.property.api.Property;
 import be.nabu.libs.property.api.Value;
 import be.nabu.libs.types.api.Attribute;
 import be.nabu.libs.types.api.BeanConvertible;
+import be.nabu.libs.types.api.CollectionHandlerProvider;
 import be.nabu.libs.types.api.ComplexContent;
 import be.nabu.libs.types.api.ComplexContentConvertible;
 import be.nabu.libs.types.api.ComplexType;
@@ -28,6 +29,7 @@ import be.nabu.libs.types.api.Element;
 import be.nabu.libs.types.api.Marshallable;
 import be.nabu.libs.types.api.RestrictableComplexType;
 import be.nabu.libs.types.api.SimpleType;
+import be.nabu.libs.types.api.SneakyEditableBeanInstance;
 import be.nabu.libs.types.api.Type;
 import be.nabu.libs.types.api.TypeInstance;
 import be.nabu.libs.validator.api.ContextUpdatableValidation;
@@ -69,7 +71,7 @@ public class TypeUtils {
 		Type beanType = resolver.resolve(beanClass.getName());
 		// it is a valid subset, create a proxy
 		if (isSubset(new BaseTypeInstance(content.getType()), new BaseTypeInstance(beanType)))
-			return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?> [] { beanClass, ComplexContentConvertible.class }, new ComplexContentInvocationHandler(content));
+			return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?> [] { beanClass, ComplexContentConvertible.class, SneakyEditableBeanInstance.class }, new ComplexContentInvocationHandler(content));
 		throw new IllegalArgumentException("Can not cast the complex content to " + beanClass);
 	}
 	
@@ -350,7 +352,25 @@ public class TypeUtils {
 				if (name.isEmpty())
 					throw new UnsupportedOperationException();
 				name = name.substring(0, 1).toLowerCase() + name.substring(1);
-				return content.get(name);
+				Object returnValue = content.get(name);
+				if (returnValue == null) {
+					return null;
+				}
+				else if (returnValue instanceof ComplexContent && !method.getReturnType().isAssignableFrom(returnValue.getClass())) {
+					return TypeUtils.getAsBean((ComplexContent) returnValue, method.getReturnType());
+				}
+				else if (returnValue instanceof Collection) {
+					CollectionHandlerProvider<? extends Object, Object> handler = CollectionHandlerFactory.getInstance().getHandler().getHandler(returnValue.getClass());
+					Class<?> componentType = handler.getComponentType(method.getGenericReturnType());
+					List<Object> list = new ArrayList<Object>();
+					for (Object child : (Collection<?>) returnValue) {
+						list.add(child instanceof ComplexContent ? TypeUtils.getAsBean((ComplexContent) child, componentType) : child);
+					}
+					return list;
+				}
+				else {
+					return returnValue;
+				}
 			}
 			else if (method.getName().startsWith("set")) {
 				// only methods that do not take parameters
@@ -358,6 +378,11 @@ public class TypeUtils {
 					throw new UnsupportedOperationException("The method " + method.getName() + " need a value argument");
 				String name = method.getName().substring(3).trim();
 				content.set(name, args[0]);
+				return null;
+			}
+			// sneaky set!
+			else if (method.getName().equals("__set") && args.length == 2) {
+				content.set((String) args[0], args[1]);
 				return null;
 			}
 			else if (method.getName().equals("toString") && (args == null || args.length == 0)) {
