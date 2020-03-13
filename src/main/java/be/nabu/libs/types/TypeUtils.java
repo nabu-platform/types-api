@@ -301,7 +301,7 @@ public class TypeUtils {
 			// first apply restrictions so you can do non-compatible types if necessary
 			// also: you don't want to be able to restrict your own children, just delete it
 			for (Value<?> value : typeInPath.getProperties()) {
-				if (value.getProperty().getName().equals("restrict") && value.getValue() != null) {
+				if (value.getProperty() != null && value.getProperty().getName() != null && value.getProperty().getName().equals("restrict") && value.getValue() != null) {
 					List<String> restricted = Arrays.asList(value.getValue().toString().split("[\\s]*,[\\s]*"));
 					Iterator<String> iterator = children.keySet().iterator();
 					while (iterator.hasNext()) {
