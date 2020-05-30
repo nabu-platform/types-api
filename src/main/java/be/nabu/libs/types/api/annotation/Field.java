@@ -21,4 +21,7 @@ public @interface Field {
 	public int minOccurs() default 0;
 	public int maxOccurs() default 1;
 	public String pattern() default "";
+	public String show() default "";
+	public String hide() default "";
+	public String comment() default "";
 }

@@ -34,7 +34,12 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <S> Value<S> getProperty(Property<S> property) {
-		return (Value<S>) properties.get(property);
+		for (Value<?> value : getProperties()) {
+			if (value.getProperty().equals(property)) {
+				return (Value<S>) value;
+			}
+		}
+		return null;
 	}
 	
 	@Override
