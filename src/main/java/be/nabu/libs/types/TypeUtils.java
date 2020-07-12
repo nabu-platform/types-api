@@ -24,6 +24,7 @@ import be.nabu.libs.types.api.CollectionHandlerProvider;
 import be.nabu.libs.types.api.ComplexContent;
 import be.nabu.libs.types.api.ComplexContentConvertible;
 import be.nabu.libs.types.api.ComplexType;
+import be.nabu.libs.types.api.DefinedType;
 import be.nabu.libs.types.api.DefinedTypeResolver;
 import be.nabu.libs.types.api.Element;
 import be.nabu.libs.types.api.Marshallable;
@@ -173,6 +174,16 @@ public class TypeUtils {
 		return new ComplexTypeValidator(type);
 	}
 
+	public static boolean isSameType(Type typeA, Type typeB) {
+		if (typeA.equals(typeB)) {
+			return true;
+		}
+		else if (typeA instanceof DefinedType && typeB instanceof DefinedType && ((DefinedType) typeA).getId().equals(((DefinedType) typeB).getId())) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static boolean isSubset(TypeInstance subsetInstance, TypeInstance broaderInstance) {
 		return isSubset(subsetInstance, broaderInstance, new HashMap<ComplexType, List<ComplexType>>());
 	}
