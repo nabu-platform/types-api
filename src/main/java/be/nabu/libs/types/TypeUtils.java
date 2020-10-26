@@ -166,6 +166,14 @@ public class TypeUtils {
 		return new RecursiveIterator(type);
 	}
 	
+	public static List<Element<?>> getLocalChildren(ComplexType type) {
+		List<Element<?>> children = new ArrayList<Element<?>>();
+		for (Element<?> child : type) {
+			children.add(child);
+		}
+		return children;
+	}
+	
 	public static Collection<Element<?>> getAllChildren(final ComplexType type) {
 		return getAllUniqueChildren(type).values();
 	}
