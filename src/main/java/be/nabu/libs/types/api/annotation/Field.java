@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 public @interface Field {
 	public String name() default "";
 	public String namespace() default "";
+	// the group this field belongs to, this can be used to create panes for example
+	public String group() default "";
 	public boolean primary() default false;
 	public boolean generated() default false;
 	public long min() default 0l;
