@@ -26,4 +26,5 @@ public @interface Field {
 	public String show() default "";
 	public String hide() default "";
 	public String comment() default "";
+	public String defaultValue() default "";
 }

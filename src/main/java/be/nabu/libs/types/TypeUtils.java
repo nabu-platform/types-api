@@ -142,7 +142,7 @@ public class TypeUtils {
 	}
 	
 	public static boolean isExtension(Type possibleExtension, Type fromParent) {
-		return possibleExtension.equals(fromParent) || !getUpcastPath(possibleExtension, fromParent).isEmpty();
+		return possibleExtension != null && fromParent != null && (isSameType(possibleExtension, fromParent) || !getUpcastPath(possibleExtension, fromParent).isEmpty());
 	}
 	
 	public static List<Type> getUpcastPath(Type fromChildType, Type toParentType) {		
