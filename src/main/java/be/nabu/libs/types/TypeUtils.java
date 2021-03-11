@@ -27,6 +27,7 @@ import be.nabu.libs.types.api.ComplexType;
 import be.nabu.libs.types.api.DefinedType;
 import be.nabu.libs.types.api.DefinedTypeResolver;
 import be.nabu.libs.types.api.Element;
+import be.nabu.libs.types.api.JavaClassWrapper;
 import be.nabu.libs.types.api.Marshallable;
 import be.nabu.libs.types.api.RestrictableComplexType;
 import be.nabu.libs.types.api.SimpleType;
@@ -449,7 +450,9 @@ public class TypeUtils {
 				return messages;
 			}
 			if (instance.getType() != null) {
-				if (!instance.getType().equals(type) && getUpcastPath(instance.getType(), type).isEmpty())
+				// java.lang.Object is special (as always!)
+				boolean isObject = type instanceof JavaClassWrapper && ((JavaClassWrapper<?>) type).getWrappedClass().equals(Object.class);
+				if (!isObject && !instance.getType().equals(type) && getUpcastPath(instance.getType(), type).isEmpty())
 					messages.add(new ValidationMessage(Severity.ERROR, "The actual type " + instance.getType() + " is not related to the expected type " + type));
 			}
 			else if (forceTypeValidation)

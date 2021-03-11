@@ -91,4 +91,8 @@ public class BaseTypeInstance implements ModifiableTypeInstance {
 		this.maintainDefaultValues = maintainDefaultValues;
 	}
 	
+	@Override
+	public String toString() {
+		return "instance of [" + type + "]"; 
+	}
 }
