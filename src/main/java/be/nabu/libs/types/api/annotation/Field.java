@@ -14,6 +14,8 @@ public @interface Field {
 	public String group() default "";
 	public boolean primary() default false;
 	public boolean generated() default false;
+	// can be used to indicate whether or not this field is environment specific
+	public boolean environmentSpecific() default false;
 	public long min() default 0l;
 	public long max() default 0l;
 	public long length() default 0l;
