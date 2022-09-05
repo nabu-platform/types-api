@@ -11,5 +11,5 @@ public @interface ComplexTypeDescriptor {
 	public String collectionName() default "";
 	public String name() default "";
 	public String namespace() default "";
-	public String[] propOrder() default {""};
+	public String[] propOrder() default {};
 }
