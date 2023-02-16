@@ -91,6 +91,23 @@ public class TypeUtils {
 		return getChild(type, parsed, true);
 	}
 	
+	public static boolean isLocalChild(ComplexType type, String name) {
+		Element<?> element = type.get(name);
+		// we need the actual element
+		if (element != null) {
+			// no super type means its always yours
+			if (!(type.getSuperType() instanceof ComplexType)) {
+				return true;
+			}
+			else {
+				Element<?> superElement = ((ComplexType) type.getSuperType()).get(name);
+				// it is local if we don't have the element in the parent or of it is a different element (e.g. through restrictions)
+				return superElement == null || !superElement.equals(element);
+			}
+		}
+		return false;
+	}
+	
 	private static Element<?> getChild(ComplexType type, ParsedPath path, boolean localOnly) {
 		Element<?> requestedChild = null;
 		// check if the child is one defined by this complex type
