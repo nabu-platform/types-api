@@ -8,4 +8,11 @@ public interface ComplexContent {
 	public ComplexType getType();
 	public void set(String path, Object value);
 	public Object get(String path);
+	
+	// Check if a complex content has a value for a given path
+	// By default we assume if the type supports it, that the content has _a_ value (could be null)
+	// If you have smarter implementations that can track changes, you can be more specific in your answer and state whether someone explicitly set a value
+	public default boolean has(String path) {
+		return getType().get(path) != null;
+	}
 }
