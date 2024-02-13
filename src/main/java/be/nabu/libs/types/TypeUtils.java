@@ -196,6 +196,36 @@ public class TypeUtils {
 		return getAllUniqueChildren(type).values();
 	}
 	
+	public static List<Value<?>> getAllProperties(Element<?> element) {
+		Map<String, Value<?>> map = new HashMap<String, Value<?>>();
+		for (Value<?> value : element.getProperties()) {
+			map.put(value.getProperty().getName(), value);
+		}
+		Type type = element.getType();
+		while (type != null) {
+			for (Value<?> value : type.getProperties()) {
+				if (!map.containsKey(value.getProperty().getName())) {
+					map.put(value.getProperty().getName(), value);
+				}
+			}
+			type = type.getSuperType();
+		}
+		return new ArrayList<Value<?>>(map.values());
+	}
+	
+	public static List<Value<?>> getAllProperties(Type type) {
+		Map<String, Value<?>> map = new HashMap<String, Value<?>>();
+		while (type != null) {
+			for (Value<?> value : type.getProperties()) {
+				if (!map.containsKey(value.getProperty().getName())) {
+					map.put(value.getProperty().getName(), value);
+				}
+			}
+			type = type.getSuperType();
+		}
+		return new ArrayList<Value<?>>(map.values());
+	}
+	
 	public static ComplexTypeValidator createComplexValidator(ComplexType type) {
 		return new ComplexTypeValidator(type);
 	}
