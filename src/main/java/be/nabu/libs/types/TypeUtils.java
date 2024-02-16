@@ -159,6 +159,37 @@ public class TypeUtils {
 			return null;
 	}
 	
+	public static List<String> getRestricted(ComplexType type, Value<?>...properties) {
+		if (properties == null || properties.length == 0) {
+			properties = type.getProperties();
+		}
+		String restrictedValue = null, allowedValue = null;
+		List<String> restricted = new ArrayList<String>();
+		for (Value<?> value : properties) {
+			if (value.getProperty().getName().equalsIgnoreCase("restrict")) {
+				restrictedValue = (String) value.getValue();
+			}
+			else if (value.getProperty().getName().equalsIgnoreCase("allow")) {
+				allowedValue = (String) value.getValue();
+			}
+		}
+		if (restrictedValue != null && !restrictedValue.trim().isEmpty()) {
+			restricted.addAll(Arrays.asList(restrictedValue.split("[\\s]*,[\\s]*")));
+		}
+		if (allowedValue != null && !allowedValue.trim().isEmpty()) {
+			// by setting an allow, you implicitly restrict everything that is not explicitly allowed
+			List<String> allowed = Arrays.asList(allowedValue.split("[\\s]*,[\\s]*"));
+			if (type.getSuperType() instanceof ComplexType) {
+				for (Element<?> child : TypeUtils.getAllChildren((ComplexType) type.getSuperType())) {
+					if (allowed.indexOf(child.getName()) < 0) {
+						restricted.add(child.getName());
+					}
+				}
+			}
+		}
+		return restricted;
+	}
+	
 	public static boolean isExtension(Type possibleExtension, Type fromParent) {
 		return possibleExtension != null && fromParent != null && (isSameType(possibleExtension, fromParent) || !getUpcastPath(possibleExtension, fromParent).isEmpty());
 	}
@@ -367,14 +398,12 @@ public class TypeUtils {
 		for (ComplexType typeInPath : path) {
 			// first apply restrictions so you can do non-compatible types if necessary
 			// also: you don't want to be able to restrict your own children, just delete it
-			for (Value<?> value : typeInPath.getProperties()) {
-				if (value.getProperty() != null && value.getProperty().getName() != null && value.getProperty().getName().equals("restrict") && value.getValue() != null) {
-					List<String> restricted = Arrays.asList(value.getValue().toString().split("[\\s]*,[\\s]*"));
-					Iterator<String> iterator = children.keySet().iterator();
-					while (iterator.hasNext()) {
-						if (restricted.indexOf(iterator.next()) >= 0) {
-							iterator.remove();
-						}
+			List<String> restrictedFields = getRestricted(typeInPath);
+			if (restrictedFields.size() > 0) {
+				Iterator<String> iterator = children.keySet().iterator();
+				while (iterator.hasNext()) {
+					if (restrictedFields.indexOf(iterator.next()) >= 0) {
+						iterator.remove();
 					}
 				}
 			}
@@ -607,4 +636,5 @@ public class TypeUtils {
 		}
 		return isMarshallable;
 	}
+	
 }
