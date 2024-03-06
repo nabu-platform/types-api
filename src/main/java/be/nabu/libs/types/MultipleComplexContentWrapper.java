@@ -19,6 +19,9 @@ public class MultipleComplexContentWrapper implements ComplexContentWrapper<Obje
 		if (object == null) {
 			return null;
 		}
+		else if (object instanceof ComplexContent) {
+			return (ComplexContent) object;
+		}
 		ComplexContentWrapper closestWrapper = null;
 		for (ComplexContentWrapper wrapper : wrappers) {
 			if (wrapper.getInstanceClass().isAssignableFrom(object.getClass())) {
