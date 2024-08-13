@@ -79,6 +79,6 @@ public interface CollectionHandlerProvider<T, V> {
 	 * The index has to be marshallable/unmarshallable
 	 * This is because the paths that we use are always strings
 	 */
-	public V unmarshalIndex(String index);
+	public V unmarshalIndex(String index, T collection);
 	public String marshalIndex(V index);
 }
