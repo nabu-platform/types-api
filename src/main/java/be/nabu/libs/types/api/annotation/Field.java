@@ -48,4 +48,5 @@ public @interface Field {
 	public String comment() default "";
 	public String defaultValue() default "";
 	public String foreignKey() default "";
+	public boolean raw() default false;
 }
